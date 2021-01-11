@@ -2,9 +2,13 @@ package timer
 
 import (
 	"container/heap"
+	"fmt"
 	"github.com/jageros/evq"
 	"math"
+	"os"
+	"os/signal"
 	"sync"
+	"syscall"
 	"time"
 )
 
@@ -218,6 +222,21 @@ func GetWeekNo(args ...int64) int {
 	return int(math.Ceil((float64(dayNo)-3)/7)) + 1
 }
 
+func StartTicks(tickInterval time.Duration) {
+	startOnce.Do(func() {
+		go func() {
+			for {
+				time.Sleep(tickInterval)
+				tick()
+			}
+		}()
+	})
+}
+
+func Stop() {
+	evq.Stop()
+}
+
 func tick() {
 	now := time.Now()
 
@@ -253,17 +272,6 @@ func tick() {
 		}
 	}
 	tLock.Unlock()
-}
-
-func StartTicks(tickInterval time.Duration) {
-	startOnce.Do(func() {
-		go func() {
-			for {
-				time.Sleep(tickInterval)
-				tick()
-			}
-		}()
-	})
 }
 
 func onTimer(ev evq.IEvent) {
