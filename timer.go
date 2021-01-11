@@ -8,12 +8,33 @@ import (
 	"time"
 )
 
+const (
+	MinuteSecond = 60                // 一分钟多少秒
+	HourSecond   = MinuteSecond * 60 // 一小时多少秒
+	DaySeconds   = HourSecond * 24   // 一天多少秒
+	WeekSecond   = DaySeconds * 7    // 一个星期多少秒
+	MonthSecond  = DaySeconds * 30   // 30天多少秒
+	YearSecond   = DaySeconds * 365  // 365天多少秒
+)
+
+const (
+	TimeFormat = "2006-01-02 15:04:05"
+	DateFormat = "2006-01-02"
+)
+
 var (
 	nextAddSeq uint64 = 1
 	tHeap      timerHeap
 	startOnce  sync.Once
 	tLock      sync.Mutex
 )
+
+var timeBaseUnix = time.Date(2020, 1, 1, 0, 0, 0, 0, time.Now().Location()).Unix()
+
+// 设置初始日期， 用于计算从该日期起，到下一个日期的天数
+func SetBaseDate(year, month, day int) {
+	timeBaseUnix = time.Date(year, time.Month(month), day, 0, 0, 0, 0, time.Now().Location()).Unix()
+}
 
 type CallbackFunc func()
 
@@ -175,10 +196,7 @@ func RunEveryHour(minute, sec int, callback CallbackFunc) *Timer {
 	return t
 }
 
-// 这一天 dayno = 1
-var now = time.Now()
-var timeBase = time.Date(2018, 6, 1, 0, 0, 0, 0, now.Location()).Unix()
-
+// 默认：2020年01月01日为第一天
 func GetDayNo(args ...int64) int {
 	var t int64
 	if len(args) > 0 {
@@ -186,7 +204,7 @@ func GetDayNo(args ...int64) int {
 	} else {
 		t = time.Now().Unix()
 	}
-	return int((t-timeBase)/86400 + 1)
+	return int((t-timeBaseUnix)/86400 + 1)
 }
 
 func GetWeekNo(args ...int64) int {
@@ -237,7 +255,7 @@ func tick() {
 	tLock.Unlock()
 }
 
-func startTicks(tickInterval time.Duration) {
+func StartTicks(tickInterval time.Duration) {
 	startOnce.Do(func() {
 		go func() {
 			for {
@@ -255,5 +273,4 @@ func onTimer(ev evq.IEvent) {
 func init() {
 	heap.Init(&tHeap)
 	evq.HandleEvent(evq.TIMER_EVENT, onTimer)
-	startTicks(time.Millisecond * 500)
 }
