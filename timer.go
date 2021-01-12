@@ -2,13 +2,9 @@ package timer
 
 import (
 	"container/heap"
-	"fmt"
 	"github.com/jageros/evq"
 	"math"
-	"os"
-	"os/signal"
 	"sync"
-	"syscall"
 	"time"
 )
 
@@ -31,6 +27,7 @@ var (
 	tHeap      timerHeap
 	startOnce  sync.Once
 	tLock      sync.Mutex
+	eventId    int
 )
 
 var timeBaseUnix = time.Date(2020, 1, 1, 0, 0, 0, 0, time.Now().Location()).Unix()
@@ -262,7 +259,7 @@ func tick() {
 			t.callback = nil
 		}
 
-		evq.PostEvent(evq.NewCommonEvent(evq.TIMER_EVENT, callback))
+		evq.PostEvent(evq.NewCommonEvent(eventId, callback))
 
 		if t.repeat {
 			t.fireTime = t.fireTime.Add(t.interval)
@@ -280,5 +277,6 @@ func onTimer(ev evq.IEvent) {
 
 func init() {
 	heap.Init(&tHeap)
-	evq.HandleEvent(evq.TIMER_EVENT, onTimer)
+	eventId = evq.CreateEventID()
+	evq.HandleEvent(eventId, onTimer)
 }
