@@ -4,9 +4,8 @@ import (
 	"container/heap"
 	"context"
 	"github.com/jageros/evq"
-	"os/signal"
+	"github.com/jageros/group"
 	"sync"
-	"syscall"
 	"time"
 )
 
@@ -245,23 +244,23 @@ func onTimer(ev evq.IEvent) {
 	ev.(*evq.CommonEvent).GetData()[0].(CallbackFunc)()
 }
 
-func init() {
-	ctx, _ := signal.NotifyContext(context.Background(), syscall.SIGINT, syscall.SIGTERM)
-	heap.Init(&tHeap)
-	eventId = evq.CreateEventID()
-	evq.HandleEvent(eventId, onTimer)
-
+func Initialize(g *group.Group) {
 	startOnce.Do(func() {
-		go func() {
+		evq.Initialize(g)
+		heap.Init(&tHeap)
+		eventId = evq.CreateEventID()
+		evq.HandleEvent(eventId, onTimer)
+		g.Go(func(ctx context.Context) error {
 			tk := time.NewTicker(time.Millisecond * 200)
 			for {
 				select {
 				case <-ctx.Done():
-					return
+					return nil
 				case <-tk.C:
 					tick()
 				}
 			}
-		}()
+		})
+
 	})
 }

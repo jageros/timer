@@ -1,4 +1,8 @@
-github.com/jageros/evq v1.0.1 h1:LVZl15U+Ig25/B3xFMYUD2LwlHEcclnSmdHueNbCcDU=
-github.com/jageros/evq v1.0.1/go.mod h1:aCAsxS5Iov8kO+uuQn4CMeY5TIZBmG6+j8EZfwt1mg0=
+github.com/jageros/evq v1.0.3 h1:U3q7dyd9216NNajTV8mmG2lfVRBZ3tZDrI4cNqYqyxQ=
+github.com/jageros/evq v1.0.3/go.mod h1:R5IbpIENX0Fjs98EZGL0yq1p4aw07VQUwAxn7yBu5iE=
+github.com/jageros/group v1.0.1 h1:ifEc2ChvmFVbofSB6t9ytnepRNhrMQrAopUc79Oyzo4=
+github.com/jageros/group v1.0.1/go.mod h1:CHMFZ+IzpytdEOlG9AhB6DBXynarvo/Q8Ih1JoawzdU=
+golang.org/x/sync v0.0.0-20210220032951-036812b2e83c h1:5KslGYwFpkhGh+Q16bwMP3cOontH8FOep7tGV86Y7SQ=
+golang.org/x/sync v0.0.0-20210220032951-036812b2e83c/go.mod h1:RxMgew5VJxzue5/jJTE5uejpjVlOe/izrB70Jof72aM=
 gopkg.in/eapache/queue.v1 v1.1.0 h1:EldqoJEGtXYiVCMRo2C9mePO2UUGnYn2+qLmlQSqPdc=
 gopkg.in/eapache/queue.v1 v1.1.0/go.mod h1:wNtmx1/O7kZSR9zNT1TTOJ7GLpm3Vn7srzlfylFbQwU=
