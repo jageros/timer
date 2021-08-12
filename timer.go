@@ -2,9 +2,11 @@ package timer
 
 import (
 	"container/heap"
+	"context"
 	"github.com/jageros/evq"
-	"math"
+	"os/signal"
 	"sync"
+	"syscall"
 	"time"
 )
 
@@ -29,13 +31,6 @@ var (
 	tLock      sync.Mutex
 	eventId    int
 )
-
-var timeBaseUnix = time.Date(2020, 1, 1, 0, 0, 0, 0, time.Now().Location()).Unix()
-
-// 设置初始日期， 用于计算从该日期起，到下一个日期的天数
-func SetBaseDate(year, month, day int) {
-	timeBaseUnix = time.Date(year, time.Month(month), day, 0, 0, 0, 0, time.Now().Location()).Unix()
-}
 
 type CallbackFunc func()
 
@@ -197,8 +192,9 @@ func RunEveryHour(minute, sec int, callback CallbackFunc) *Timer {
 	return t
 }
 
-// 默认：2020年01月01日为第一天
-func GetDayNo(args ...int64) int {
+// GetDayNo 获取从year年，month月，day日到目前或者时间戳args[0]的天数
+func GetDayNo(year, month, day int, args ...int64) int {
+	timeBaseUnix := time.Date(year, time.Month(month), day, 0, 0, 0, 0, time.Now().Location()).Unix()
 	var t int64
 	if len(args) > 0 {
 		t = args[0]
@@ -206,32 +202,6 @@ func GetDayNo(args ...int64) int {
 		t = time.Now().Unix()
 	}
 	return int((t-timeBaseUnix)/86400 + 1)
-}
-
-func GetWeekNo(args ...int64) int {
-	var t int64
-	if len(args) > 0 {
-		t = args[0]
-	} else {
-		t = time.Now().Unix()
-	}
-	dayNo := GetDayNo(t)
-	return int(math.Ceil((float64(dayNo)-3)/7)) + 1
-}
-
-func StartTicks(tickInterval time.Duration) {
-	startOnce.Do(func() {
-		go func() {
-			for {
-				time.Sleep(tickInterval)
-				tick()
-			}
-		}()
-	})
-}
-
-func Stop() {
-	evq.Stop()
 }
 
 func tick() {
@@ -276,7 +246,22 @@ func onTimer(ev evq.IEvent) {
 }
 
 func init() {
+	ctx, _ := signal.NotifyContext(context.Background(), syscall.SIGINT, syscall.SIGTERM)
 	heap.Init(&tHeap)
 	eventId = evq.CreateEventID()
 	evq.HandleEvent(eventId, onTimer)
+
+	startOnce.Do(func() {
+		go func() {
+			tk := time.NewTicker(time.Millisecond * 200)
+			for {
+				select {
+				case <-ctx.Done():
+					return
+				case <-tk.C:
+					tick()
+				}
+			}
+		}()
+	})
 }

@@ -1,4 +1,4 @@
-github.com/jageros/evq v1.0.0 h1:A02p5tTJdx6vC6vnlNjM6IBndNKhjwqkO21olnmo+cc=
-github.com/jageros/evq v1.0.0/go.mod h1:hu2KkExgkc77iAY/N0n2McTPo8gMPg+pLi8T1DQC8kQ=
+github.com/jageros/evq v1.0.1 h1:LVZl15U+Ig25/B3xFMYUD2LwlHEcclnSmdHueNbCcDU=
+github.com/jageros/evq v1.0.1/go.mod h1:aCAsxS5Iov8kO+uuQn4CMeY5TIZBmG6+j8EZfwt1mg0=
 gopkg.in/eapache/queue.v1 v1.1.0 h1:EldqoJEGtXYiVCMRo2C9mePO2UUGnYn2+qLmlQSqPdc=
 gopkg.in/eapache/queue.v1 v1.1.0/go.mod h1:wNtmx1/O7kZSR9zNT1TTOJ7GLpm3Vn7srzlfylFbQwU=
